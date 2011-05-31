@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<project name="clojure-xml-stream" basedir="." default="build">
+    <target name="build">
+        <taskdef name="clojure-compile"
+            classname="com.ubermensch.ant.clojure.CompileTask"
+            classpath="lib/clojure-ant-tasks.jar:lib/clojure.jar:lib/clojure-contrib.jar" />
+        <clojure-compile>
+            <classpath>
+                <pathelement location="src/main" />
+            </classpath>
+            <fileset dir="src/main" includes="**/*.clj" />
+            <fileset dir="src/examples" includes="**/*.clj" />
+        </clojure-compile>
+    </target>
+</project>
