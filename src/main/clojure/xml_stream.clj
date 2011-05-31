@@ -38,14 +38,15 @@
     (take-while identity (repeatedly #(transformer nil nil)))))
 
 (defn make-stream-reader
-  "Create a XMLStreamReader instance from File, InputStream or URI string"
+  "Create a XMLStreamReader instance from Reader or InputStream"
   [input]
   (.createXMLStreamReader (XMLInputFactory/newInstance) input))
 
 (defn parse-dispatch
   "Start a lazy sequence of objects from the XML input"
   [input handler]
-  (dispatch-stream (make-stream-reader input) handler))
+  (with-open [^XMLStreamReader stream-reader (make-stream-reader input)]
+    (dispatch-stream stream-reader handler)))
 
 (defn dispatch-partial
   "Eagerly parse a XML subtree into a sequence of objects"
@@ -70,4 +71,14 @@
           (callback [(keyword (.. item getClass getSimpleName)) qname]
                           stream-reader item)
           (callback qname stream-reader))))))
+
+(defn attribute-value [^XMLStreamReader stream-reader qname]
+  "When positioned on START_ELEMENT, read attribute by name"
+  (.getAttributeValue stream-reader nil qname))
+
+(defn element-text [^XMLStreamReader stream-reader]
+  "When positioned on START_ELEMENT with text inside, read that text.
+  Might fail terribly because no checks are made."
+  (.next stream-reader)
+  (.getText stream-reader))
 

@@ -1,0 +1,24 @@
+<ground>
+  <tree-species>
+    <tree id="1"><name>Pine</name></tree>
+    <tree id="2"><name>Birch</name></tree>
+    <tree id="4"><name>Palmtree</name></tree>
+  </tree-species>
+  <forests>
+    <forest id="1">
+      <name>Red Forest</name>
+      <trees>
+        <tree refid="1"><branch direction="left"/><branch direction="south"/></tree>
+        <tree refid="2"><branch direction="right"/><branch direction="south"/><branch direction="west"/></tree>
+        <tree refid="1"><branch direction="southwest"/></tree>
+      </trees>
+    </forest>
+    <forest id="2">
+      <name>Dark Forest</name>
+      <trees>
+        <tree refid="2"><branch direction="right"/><branch direction="south"/><branch direction="west"/></tree>
+        <tree refid="4"><branch direction="northwest"/></tree>
+      </trees>
+    </forest>
+  </forests>
+</ground>  

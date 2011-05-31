@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<project name="clojure-xml-stream" basedir="." default="build">
+<project name="clojure-xml-stream" basedir="." default="example">
     <target name="build">
         <taskdef name="clojure-compile"
             classname="com.ubermensch.ant.clojure.CompileTask"
@@ -8,9 +8,23 @@
         <clojure-compile>
             <classpath>
                 <pathelement location="src/main" />
+                <pathelement location="src/examples" />
             </classpath>
             <fileset dir="src/main" includes="**/*.clj" />
             <fileset dir="src/examples" includes="**/*.clj" />
         </clojure-compile>
+    </target>
+
+    <target name="example" depends="build">
+        <java classname="clojure.main" fork="true">
+            <classpath>
+                <fileset dir="lib">
+                    <include name="**/*.jar" />
+                </fileset>
+                <pathelement location="classes" />
+            </classpath>
+            <arg value="-e" />
+            <arg value="(use 'example) (run &quot;example.xml&quot;)" />
+        </java>
     </target>
 </project>
