@@ -1,10 +1,10 @@
 (ns clojure.xml-stream
   (:import
-    (javax.xml.stream XMLInputFactory XMLStreamConstants)))
+    (javax.xml.stream XMLInputFactory XMLStreamReader XMLStreamConstants)))
 
 (set! *warn-on-reflection* true)
 
-(defn- stream-transformer [stream-reader handler]
+(defn- stream-transformer [^XMLStreamReader stream-reader handler]
   (let [xml-path (atom [])]
     (fn [current-item item-depth]
       (if (= (.getEventType stream-reader) XMLStreamConstants/START_ELEMENT)
@@ -31,7 +31,7 @@
             (.next stream-reader)
             (recur item new-item-depth)))))))
 
-(defn- dispatch-stream [stream-reader handler]
+(defn- dispatch-stream [^XMLStreamReader stream-reader handler]
   (let [transformer (stream-transformer stream-reader handler)]
     (while (not= (.getEventType stream-reader) XMLStreamConstants/START_ELEMENT)
       (.next stream-reader))
@@ -63,7 +63,7 @@
   dispatch-partial.
   Handy for transferring element-based objects into defrecords.
   See the examples."
-  (fn [stream-reader item]
+  (fn [^XMLStreamReader stream-reader ^Object item]
     (if (= (.getEventType stream-reader) XMLStreamConstants/START_ELEMENT)
       (let [qname (keyword (.getLocalName stream-reader))]
         (if item
