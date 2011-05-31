@@ -1,0 +1,99 @@
+Hi *! I've tried a few searches on parsing XML files larger than memory, didn't find anything and wrote a simple framework for parsing XML via STAX to lazy sequence of defrecords. It is therefore capable of reading several GB of xml without much problems. It is quite declarative but also quite ugly.
+
+Take a peek:
+(technical babble after the fold)
+
+$ git clone git://github.com/alamar/clojure-xml-stream.git
+$ ant
+
+It turns this completely-invented XML:
+
+<ground>
+  <tree-species>
+    <tree id="1"><name>Pine</name></tree>
+    <tree id="2"><name>Birch</name></tree>
+    <tree id="4"><name>Palmtree</name></tree>
+  </tree-species>
+  <forests>
+    <forest id="1">
+      <name>Red Forest</name>
+      <trees>
+        <tree refid="1"><branch direction="left"/><branch direction="south"/></tree>
+        <tree refid="2"><branch direction="right"/><branch direction="south"/><branch direction="west"/></tree>
+        <tree refid="1"><branch direction="southwest"/></tree>
+      </trees>
+    </forest>
+    <forest id="2">
+      <name>Dark Forest</name>
+      <trees>
+        <tree refid="2"><branch direction="right"/><branch direction="south"/><branch direction="west"/></tree>
+        <tree refid="4"><branch direction="northwest"/></tree>
+      </trees>
+    </forest>
+  </forests>
+</ground>  
+
+into a lazy sequence of:
+
+ #:example.TreeSpecies{:id 1, :name Pine}
+ #:example.TreeSpecies{:id 2, :name Birch}
+ #:example.TreeSpecies{:id 4, :name Palmtree}
+ #:example.Forest{:id 1, :trees [#:example.Tree{:species-id 1, :branches (:left :south)} #:example.Tree{:species-id 2, :branches (:right :south :west)} #:example.Tree{:species-id 1, :branches (:southwest)}], :name Red Forest}
+ #:example.Forest{:id 2, :trees [#:example.Tree{:species-id 2, :branches (:right :south :west)} #:example.Tree{:species-id 4, :branches (:northwest)}], :name Dark Forest}
+
+using this code:
+
+(defrecord TreeSpecies [id name])
+(defrecord Forest [id trees name])
+(defrecord Tree [species-id branches])
+
+(defmulti ground-element first-arg)
+
+(defmulti tree-element first-arg)
+
+(defmethod ground-element :tree [_ stream-reader]
+  (TreeSpecies. (attribute-value stream-reader "id") nil))
+
+(defmethod ground-element [:TreeSpecies :name] [_ stream-reader tree]
+  (assoc tree :name (element-text stream-reader)))
+
+(defmethod ground-element :forest [_ stream-reader]
+  (Forest. (attribute-value stream-reader "id") [] nil))
+
+(defmethod ground-element [:Forest :name] [_ stream-reader forest]
+  (assoc forest :name (element-text stream-reader)))
+
+(defmethod ground-element [:Forest :tree] [_ stream-reader forest]
+  (assoc forest :trees
+    (conj (:trees forest)
+      (Tree. (attribute-value stream-reader "refid")
+        (dispatch-partial stream-reader
+          (element-struct-handler tree-element))))))
+
+(defmethod tree-element :branch [_ stream-reader]
+  (keyword (attribute-value stream-reader "direction")))
+
+(defmethod ground-element :default [token & whatever]
+  (comment println token))
+(defmethod tree-element :default [token & whatever]
+  (comment println token))
+
+(defn run [path]
+  (with-open [input-stream (FileInputStream. path)]
+    (let [handler (element-struct-handler ground-element)
+          objects (parse-dispatch input-stream handler)]
+      (doseq [object objects] (println object)))))
+
+
+
+How it works: it reads elements and calls a method with the :ElementName
+If the method returns a record, it stuffs anything found in that element into this record.
+It can handle nested structures because it can parse subtrees (there is an example in code).
+The handler have to read events from stax (to get text nodes, for example), the only limitation is that handler should never iterate past END_ELEMENT of the element it was called on (or the parser would become confused).
+
+
+The syntax and the way I call assoc seem ugly to me, so all suggestions are welcome.
+Suggestions on naming and general architecture are welcome too.
+Maybe this can grow into something generally usable.
+
+Feel free to fork, use and complain.
