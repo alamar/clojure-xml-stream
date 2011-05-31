@@ -5,6 +5,7 @@
         <taskdef name="clojure-compile"
             classname="com.ubermensch.ant.clojure.CompileTask"
             classpath="lib/clojure-ant-tasks.jar:lib/clojure.jar:lib/clojure-contrib.jar" />
+        <mkdir dir="classes"/>
         <clojure-compile>
             <classpath>
                 <pathelement location="src/main" />
