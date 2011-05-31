@@ -16,6 +16,7 @@
     </target>
 
     <target name="example" depends="build">
+        <echo message="cat example.xml for the input"/>
         <java classname="clojure.main" fork="true">
             <classpath>
                 <fileset dir="lib">
