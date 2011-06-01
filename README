@@ -47,44 +47,40 @@ using this code:
 (defrecord Forest [id trees name])
 (defrecord Tree [species-id branches])
 
-(defmulti ground-element first-arg)
+(defmulti ground-element class-element)
 
-(defmulti tree-element first-arg)
+(defmulti tree-element class-element)
 
-(defmethod ground-element :tree [_ stream-reader]
+(defmethod ground-element :tree [stream-reader _]
   (TreeSpecies. (attribute-value stream-reader "id") nil))
 
-(defmethod ground-element [:TreeSpecies :name] [_ stream-reader tree]
+(defmethod ground-element [:TreeSpecies :name] [stream-reader tree]
   (assoc tree :name (element-text stream-reader)))
 
-(defmethod ground-element :forest [_ stream-reader]
+(defmethod ground-element :forest [stream-reader _]
   (Forest. (attribute-value stream-reader "id") [] nil))
 
-(defmethod ground-element [:Forest :name] [_ stream-reader forest]
+(defmethod ground-element [:Forest :name] [stream-reader forest]
   (assoc forest :name (element-text stream-reader)))
 
-(defmethod ground-element [:Forest :tree] [_ stream-reader forest]
+(defmethod ground-element [:Forest :tree] [stream-reader forest]
   (assoc forest :trees
     (conj (:trees forest)
       (Tree. (attribute-value stream-reader "refid")
-        (dispatch-partial stream-reader
-          (element-struct-handler tree-element))))))
+        (dispatch-partial stream-reader tree-element)))))
 
-(defmethod tree-element :branch [_ stream-reader]
+(defmethod tree-element :branch [stream-reader _]
   (keyword (attribute-value stream-reader "direction")))
 
-(defmethod ground-element :default [token & whatever]
-  (comment println token))
-(defmethod tree-element :default [token & whatever]
-  (comment println token))
+(defmethod ground-element :default [stream-reader item]
+  nil)
+(defmethod tree-element :default [stream-reader item]
+  nil)
 
 (defn run [path]
   (with-open [input-stream (FileInputStream. path)]
-    (let [handler (element-struct-handler ground-element)
-          objects (parse-dispatch input-stream handler)]
+    (let [objects (parse-dispatch input-stream ground-element)]
       (doseq [object objects] (println object)))))
-
-
 
 How it works: it reads elements and calls a method with the :ElementName
 If the method returns a record, it stuffs anything found in that element into this record.

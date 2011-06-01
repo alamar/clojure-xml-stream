@@ -58,19 +58,17 @@
   [arg & whatever]
   arg)
 
-(defn element-struct-handler [callback]
-  "Turn a method dispatching on first-arg matching on :ElementName or
-  [:ParentClassName :ElementName] into a handler for parse-dispatch and
-  dispatch-partial.
+(defn class-element [^XMLStreamReader stream-reader item]
+  "Used in method dispatch matching on :ElementName or
+  [:ParentClassName :ElementName].
   Handy for transferring element-based objects into defrecords.
   See the examples."
-  (fn [^XMLStreamReader stream-reader ^Object item]
-    (if (= (.getEventType stream-reader) XMLStreamConstants/START_ELEMENT)
-      (let [qname (keyword (.getLocalName stream-reader))]
-        (if item
-          (callback [(keyword (.. item getClass getSimpleName)) qname]
-                          stream-reader item)
-          (callback qname stream-reader))))))
+  (if (= (.getEventType stream-reader) XMLStreamConstants/START_ELEMENT)
+    (let [qname (keyword (.getLocalName stream-reader))]
+      (if item
+        [(keyword (.. item getClass getSimpleName)) qname]
+        qname))
+    :default))
 
 (defn attribute-value [^XMLStreamReader stream-reader qname]
   "When positioned on START_ELEMENT, read attribute by name"
