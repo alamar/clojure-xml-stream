@@ -14,7 +14,7 @@
       </trees>
     </forest>
     <forest id="2">
-      <name>Dark Forest</name>
+      <name>Dark Wood</name>
       <trees>
         <tree refid="2"><branch direction="right"/><branch direction="south"/><branch direction="west"/></tree>
         <tree refid="4"><branch direction="northwest"/></tree>

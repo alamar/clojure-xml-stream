@@ -4,6 +4,7 @@ Take a peek:
 (technical babble after the fold)
 
 $ git clone git://github.com/alamar/clojure-xml-stream.git
+$ cd clojure-xml-stream
 $ ant
 
 It turns this completely-invented XML:
@@ -24,7 +25,7 @@ It turns this completely-invented XML:
       </trees>
     </forest>
     <forest id="2">
-      <name>Dark Forest</name>
+      <name>Dark Wood</name>
       <trees>
         <tree refid="2"><branch direction="right"/><branch direction="south"/><branch direction="west"/></tree>
         <tree refid="4"><branch direction="northwest"/></tree>
@@ -39,7 +40,7 @@ into a lazy sequence of:
  #:example.TreeSpecies{:id 2, :name Birch}
  #:example.TreeSpecies{:id 4, :name Palmtree}
  #:example.Forest{:id 1, :trees [#:example.Tree{:species-id 1, :branches (:left :south)} #:example.Tree{:species-id 2, :branches (:right :south :west)} #:example.Tree{:species-id 1, :branches (:southwest)}], :name Red Forest}
- #:example.Forest{:id 2, :trees [#:example.Tree{:species-id 2, :branches (:right :south :west)} #:example.Tree{:species-id 4, :branches (:northwest)}], :name Dark Forest}
+ #:example.Forest{:id 2, :trees [#:example.Tree{:species-id 2, :branches (:right :south :west)} #:example.Tree{:species-id 4, :branches (:northwest)}], :name Dark Wood}
 
 using this code:
 
