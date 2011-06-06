@@ -58,7 +58,7 @@
   [arg & whatever]
   arg)
 
-(defn class-element [^XMLStreamReader stream-reader item]
+(defn class-element [^XMLStreamReader stream-reader ^Object item]
   "Used in method dispatch matching on :ElementName or
   [:ParentClassName :ElementName].
   Handy for transferring element-based objects into defrecords.
@@ -70,11 +70,11 @@
         qname))
     :default))
 
-(defn attribute-value [^XMLStreamReader stream-reader qname]
+(defn ^String attribute-value [^XMLStreamReader stream-reader qname]
   "When positioned on START_ELEMENT, read attribute by name"
   (.getAttributeValue stream-reader nil qname))
 
-(defn element-text [^XMLStreamReader stream-reader]
+(defn ^String element-text [^XMLStreamReader stream-reader]
   "When positioned on START_ELEMENT with text inside, read that text.
   Might fail terribly because no checks are made."
   (.next stream-reader)

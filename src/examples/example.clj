@@ -2,6 +2,8 @@
   (:import (java.io FileInputStream))
   (:use clojure.xml-stream))
 
+(set! *warn-on-reflection* true)
+
 (defrecord TreeSpecies [id name])
 (defrecord Forest [id trees name])
 (defrecord Tree [species-id branches])
