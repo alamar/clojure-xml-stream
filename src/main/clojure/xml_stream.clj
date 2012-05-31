@@ -77,6 +77,5 @@
 (defn ^String element-text [^XMLStreamReader stream-reader]
   "When positioned on START_ELEMENT with text inside, read that text.
   Might fail terribly because no checks are made."
-  (.next stream-reader)
-  (.getText stream-reader))
+  (.getElementText stream-reader))
 
