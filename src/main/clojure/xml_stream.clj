@@ -31,7 +31,8 @@
             (.next stream-reader)
             (recur item new-item-depth)))))))
 
-(defn- dispatch-stream [^XMLStreamReader stream-reader handler]
+(defn dispatch-stream [^XMLStreamReader stream-reader handler]
+  "Start a lazy sequence of objects from the XML input"
   (let [transformer (stream-transformer stream-reader handler)]
     (while (not= (.getEventType stream-reader) XMLStreamConstants/START_ELEMENT)
       (.next stream-reader))
@@ -41,12 +42,6 @@
   "Create a XMLStreamReader instance from Reader or InputStream"
   [input]
   (.createXMLStreamReader (XMLInputFactory/newInstance) input))
-
-(defn parse-dispatch
-  "Start a lazy sequence of objects from the XML input"
-  [input handler]
-  (with-open [^XMLStreamReader stream-reader (make-stream-reader input)]
-    (dispatch-stream stream-reader handler)))
 
 (defn dispatch-partial
   "Eagerly parse a XML subtree into a sequence of objects"
@@ -76,6 +71,6 @@
 
 (defn ^String element-text [^XMLStreamReader stream-reader]
   "When positioned on START_ELEMENT with text inside, read that text.
-  Might fail terribly because no checks are made."
+  Might fail terribly."
   (.getElementText stream-reader))
 
