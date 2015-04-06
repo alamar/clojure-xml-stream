@@ -40,6 +40,6 @@
 
 (defn run [path]
   (with-open [input-stream (FileInputStream. path)]
-    (let [objects (parse-dispatch input-stream ground-element)]
+    (let [objects (dispatch-stream (make-stream-reader input-stream) ground-element)]
       (doseq [object objects] (println object)))))
 
